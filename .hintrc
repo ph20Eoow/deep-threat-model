@@ -1,0 +1,17 @@
+{
+  "extends": [
+    "development"
+  ],
+  "hints": {
+    "typescript-config/consistent-casing": "off",
+    "typescript-config/no-relative-imports": "off",
+    "typescript-config/strict": "off",
+    "typescript-config/no-unresolved": "off",
+    "typescript-config/no-unused-vars": "off",
+    "typescript-config/no-empty-object-type": "off",
+    "typescript-config/no-explicit-any": "off",
+    "typescript-config/no-require-imports": "off",
+    "typescript-config/no-shadowed-variable": "off",
+    
+  }
+}
