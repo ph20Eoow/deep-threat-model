@@ -12,6 +12,5 @@
     "typescript-config/no-explicit-any": "off",
     "typescript-config/no-require-imports": "off",
     "typescript-config/no-shadowed-variable": "off",
-    
   }
 }

@@ -7,7 +7,7 @@ const Logo = () => {
       size="lg"
       className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
     >
-      <div className={cn("font-mono px-2")}>/rThreatModel</div>
+      <div className={cn("font-mono px-2")}>Deep-ThreatModel</div>
     </SidebarMenuButton>
   );
 };

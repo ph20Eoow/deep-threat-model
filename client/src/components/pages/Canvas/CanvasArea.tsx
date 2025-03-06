@@ -2,8 +2,6 @@ import React, { useCallback, useEffect } from 'react';
 import {
   ReactFlow,
   Background,
-  Controls,
-  MiniMap,
   useNodesState,
   useEdgesState,
   Node,
@@ -13,14 +11,11 @@ import {
   Connection,
   useReactFlow,
   MarkerType,
-  addEdge,
   ConnectionMode,
   Panel,
   reconnectEdge
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Button } from '@/components/ui/button';
-import { PlusCircle, FolderPlus } from 'lucide-react';
 import { IconNode, GroupNode } from './NodeTypes/CustomNodes';
 import SimpleFloatingEdge from './EdgeTypes/SimpleFloatingEdge';
 // Define node types
@@ -71,19 +66,19 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({
     if (focusedLineNumber === null) return;
     
     // Find the node or edge that corresponds to the focused line
-    const nodeToFocus = nodes.find(node => 
+    const nodeToFocus = nodes.find((node: Node) => 
       node.data?.sourceLineNumber === focusedLineNumber
     );
     
-    const edgeToFocus = edges.find(edge => 
+    const edgeToFocus = edges.find((edge: Edge) => 
       edge.data?.sourceLineNumber === focusedLineNumber
     );
     
     // If we found a matching node, focus it
     if (nodeToFocus) {
       // Highlight the node somehow (e.g., by adding a selected class)
-      setNodes(prev => 
-        prev.map(node => ({
+      setNodes((prev: Node[]) => 
+        prev.map((node: Node) => ({
           ...node,
           selected: node.id === nodeToFocus.id,
           style: {
@@ -105,8 +100,8 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({
     // If we found a matching edge, focus it
     if (edgeToFocus) {
       // Highlight the edge
-      setEdges(prev => 
-        prev.map(edge => ({
+      setEdges((prev: Edge[]) => 
+        prev.map((edge: Edge) => ({
           ...edge,
           selected: edge.id === edgeToFocus.id,
           style: {
@@ -118,8 +113,8 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({
       );
       
       // Find source and target nodes to fit view
-      const sourceNode = nodes.find(node => node.id === edgeToFocus.source);
-      const targetNode = nodes.find(node => node.id === edgeToFocus.target);
+      const sourceNode = nodes.find((node: Node) => node.id === edgeToFocus.source);
+      const targetNode = nodes.find((node: Node) => node.id === edgeToFocus.target);
       
       if (sourceNode && targetNode) {
         setTimeout(() => {
@@ -182,7 +177,7 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({
       };
       
       // Add the new edge
-      setEdges(prevEdges => [...prevEdges, newEdge]);
+      setEdges((prevEdges: Edge[]) => [...prevEdges, newEdge]);
       
       // Notify parent about the change
       setTimeout(() => onDiagramChange(nodes, [...edges, newEdge]), 0);
@@ -196,7 +191,7 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({
     
     const { x, y, zoom } = reactFlowInstance.getViewport();
     const newNodeId = `node_${Date.now()}`;
-    const nodeNumber = nodes.filter(n => n.type !== 'group').length + 1;
+    const nodeNumber = nodes.filter((n: Node) => n.type !== 'group').length + 1;
     
     const newNode: Node = {
       id: newNodeId,
@@ -219,7 +214,7 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({
     };
     
     // Add the new node to the nodes array
-    setNodes(prevNodes => [...prevNodes, newNode]);
+    setNodes((prevNodes: Node[]) => [...prevNodes, newNode]);
     
     // Notify parent about the change
     setTimeout(() => onDiagramChange([...nodes, newNode], edges), 0);
@@ -231,7 +226,7 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({
     
     const { x, y, zoom } = reactFlowInstance.getViewport();
     const newNodeId = `group_${Date.now()}`;
-    const groupNumber = nodes.filter(n => n.type === 'group').length + 1;
+    const groupNumber = nodes.filter((n: Node) => n.type === 'group').length + 1;
     
     const newNode: Node = {
       id: newNodeId,
@@ -256,7 +251,7 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({
     };
     
     // Add the new node to the nodes array
-    setNodes(prevNodes => [...prevNodes, newNode]);
+    setNodes((prevNodes: Node[]) => [...prevNodes, newNode]);
     
     // Notify parent about the change
     setTimeout(() => onDiagramChange([...nodes, newNode], edges), 0);
@@ -265,11 +260,11 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({
   const onEdgeUpdate = useCallback(
     (oldEdge: Edge, newConnection: Connection) => {
       onUserAction();
-      setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
+      setEdges((els: Edge[]) => reconnectEdge(oldEdge, newConnection, els));
       
       // Notify parent about the change
       setTimeout(() => {
-        const updatedEdges = edges.map(e => 
+        const updatedEdges = edges.map((e: Edge) => 
           e.id === oldEdge.id ? {
             ...e,
             source: newConnection.source || e.source,
@@ -304,16 +299,6 @@ const CanvasArea: React.FC<CanvasAreaProps> = ({
         // connectionLineComponent={FloatingConnectionLine}
       >
         <Background gap={12} size={1} />
-        <Panel position="top-right">
-          <div className="flex gap-2">
-            <Button size="sm" onClick={addGroupNode} className="flex items-center gap-1">
-              <FolderPlus size={14} /> Add Group
-            </Button>
-            <Button size="sm" onClick={addNode} className="flex items-center gap-1">
-              <PlusCircle size={14} /> Add Node
-            </Button>
-          </div>
-        </Panel>
       </ReactFlow>
     </div>
   );

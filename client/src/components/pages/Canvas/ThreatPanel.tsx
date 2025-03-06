@@ -13,9 +13,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useAppStore, Threat } from "@/stores/app";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { ScrollArea } from "@/components/ui/scroll-area";
 const ThreatPanel = () => {
   const [selectedThreat, setSelectedThreat] = useState<Threat | null>(null);
   const { threats } = useAppStore();
@@ -25,9 +26,6 @@ const ThreatPanel = () => {
   };
   return (
     <div className="flex flex-col h-screen p-2">
-      <div className="flex justify-end">
-        <Button onClick={() => useAppStore.getState().requestModeling()}>Start Modeling</Button>
-      </div>
       <div className="flex-1 p-2">
         <Table>
           <TableHeader>
@@ -40,20 +38,22 @@ const ThreatPanel = () => {
           </TableHeader>
           <TableBody>
             {threats.map((item) => (
-              <TableRow
-                key={item.id}
-                onClick={() => handleThreatOnClick(item)}
-              >
-                <TableCell className="font-medium">{item.scope.source} {item.scope.direction} {item.scope.target}</TableCell>
+              <TableRow key={item.id} onClick={() => handleThreatOnClick(item)}>
+                <TableCell className="font-medium">
+                  {item.scope.source} {item.scope.direction} {item.scope.target}
+                </TableCell>
                 <TableCell className="text-left">
                   <p>{item.impacts}</p>
                 </TableCell>
                 <TableCell className="text-left">
                   <p>{item.techniques}</p>
                 </TableCell>
-                <TableCell className="text-left">
-                  <p>{item.mitigation}</p>
-                </TableCell>
+                <p
+                  className="max-w-md overflow-hidden text-ellipsis whitespace-nowrap"
+                  title={item.mitigation}
+                >
+                  {item.mitigation || ""}
+                </p>
               </TableRow>
             ))}
             {threats.length === 0 && (
@@ -68,14 +68,21 @@ const ThreatPanel = () => {
         {selectedThreat && (
           <Card>
             <CardHeader>
-              <CardTitle>{selectedThreat.scope.source} {selectedThreat.scope.direction} {selectedThreat.scope.target}</CardTitle>
+              <CardTitle>
+                {selectedThreat.scope.source} {selectedThreat.scope.direction}{" "}
+                {selectedThreat.scope.target}
+              </CardTitle>
               <CardDescription>{selectedThreat.impacts}</CardDescription>
             </CardHeader>
             <CardContent>
-              <p>Threat</p>
-              <p>{selectedThreat.techniques}</p>
-              <p>Mitigation</p>
-              <p>{selectedThreat.mitigation}</p>
+              <ScrollArea className="h-96">
+                <p>Threat</p>
+                <p>{selectedThreat.techniques}</p>
+                <p className="font-bold">Mitigation Options:</p>
+                <Markdown remarkPlugins={[remarkGfm]}>
+                  {selectedThreat.mitigation}
+                </Markdown>
+              </ScrollArea>
             </CardContent>
           </Card>
         )}
