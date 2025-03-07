@@ -1,12 +1,5 @@
 import React, { useState } from "react";
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import {
   Table,
   TableBody,
   TableCell,
@@ -14,16 +7,63 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useAppStore, Threat } from "@/stores/app";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Loader2 } from "lucide-react";
+import ThreatDetailsSheet from "./ThreatDetailsSheet";
+
 const ThreatPanel = () => {
   const [selectedThreat, setSelectedThreat] = useState<Threat | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const { threats } = useAppStore();
 
   const handleThreatOnClick = (threat: Threat) => {
     setSelectedThreat(threat);
+    setSheetOpen(true);
   };
+
+  const renderScopePreview = (threat: Threat) => {
+    if (!threat.scope) return "N/A";
+    
+    if (Array.isArray(threat.scope)) {
+      if (threat.scope.length === 0) return "N/A";
+      const first = threat.scope[0];
+      return `${first.source} ${first.direction} ${first.target}`;
+    } 
+    else {
+      return `${threat.scope.source} ${threat.scope.direction} ${threat.scope.target}`;
+    }
+  };
+
+  const renderList = (items: string[] | string) => {
+    if (!items) return "N/A";
+    if (Array.isArray(items)) {
+      if (items.length === 0) return "N/A";
+      return items.join(", ");
+    }
+    return items;
+  };
+
+  const renderMitigation = (threat: Threat) => {
+    if (threat.researchStatus === 'researching') {
+      return (
+        <div className="flex items-center text-blue-600">
+          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+          <span>Researching...</span>
+        </div>
+      );
+    }
+    if (threat.researchStatus === 'pending') {
+      return <span className="text-gray-500">Pending...</span>;
+    }
+    if (threat.mitigation) {
+      return (
+        <p className="max-w-md truncate" title={threat.mitigation}>
+          {threat.mitigation}
+        </p>
+      );
+    }
+    return "No data";
+  };
+
   return (
     <div className="flex flex-col h-screen p-2">
       <div className="flex-1 p-2">
@@ -38,22 +78,24 @@ const ThreatPanel = () => {
           </TableHeader>
           <TableBody>
             {threats.map((item) => (
-              <TableRow key={item.id} onClick={() => handleThreatOnClick(item)}>
+              <TableRow 
+                key={item.id} 
+                onClick={() => handleThreatOnClick(item)}
+                className={`hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer
+                  ${item.researchStatus === 'researching' ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
+              >
                 <TableCell className="font-medium">
-                  {item.scope.source} {item.scope.direction} {item.scope.target}
+                  {renderScopePreview(item)}
                 </TableCell>
                 <TableCell className="text-left">
-                  <p>{item.impacts}</p>
+                  <p>{renderList(item.impacts)}</p>
                 </TableCell>
                 <TableCell className="text-left">
-                  <p>{item.techniques}</p>
+                  <p>{renderList(item.techniques)}</p>
                 </TableCell>
-                <p
-                  className="max-w-md overflow-hidden text-ellipsis whitespace-nowrap"
-                  title={item.mitigation}
-                >
-                  {item.mitigation || ""}
-                </p>
+                <TableCell className="text-left">
+                  {renderMitigation(item)}
+                </TableCell>
               </TableRow>
             ))}
             {threats.length === 0 && (
@@ -65,27 +107,12 @@ const ThreatPanel = () => {
             )}
           </TableBody>
         </Table>
-        {selectedThreat && (
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                {selectedThreat.scope.source} {selectedThreat.scope.direction}{" "}
-                {selectedThreat.scope.target}
-              </CardTitle>
-              <CardDescription>{selectedThreat.impacts}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-96">
-                <p>Threat</p>
-                <p>{selectedThreat.techniques}</p>
-                <p className="font-bold">Mitigation Options:</p>
-                <Markdown remarkPlugins={[remarkGfm]}>
-                  {selectedThreat.mitigation}
-                </Markdown>
-              </ScrollArea>
-            </CardContent>
-          </Card>
-        )}
+        
+        <ThreatDetailsSheet 
+          isOpen={sheetOpen} 
+          onOpenChange={setSheetOpen}
+          threat={selectedThreat}
+        />
       </div>
     </div>
   );

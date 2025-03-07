@@ -19,6 +19,7 @@ export interface Threat {
   summary: string;
   severity: string;
   likelihood: string;
+  researchStatus: 'pending' | 'researching' | 'complete';
 }
 
 interface TMResponse {
