@@ -4,7 +4,8 @@ from contextlib import asynccontextmanager
 from api import tm
 import logfire
 from config import config
-logfire.configure(token=config.LOGFIRE_API_KEY)
+if config.LOGFIRE_API_KEY:
+    logfire.configure(token=config.LOGFIRE_API_KEY)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -47,4 +48,4 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8098, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
