@@ -150,6 +150,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
               }
             } catch (e) {
               console.error("Error parsing SSE message:", e, message);
+            } finally {
+              set({ isProcessing: false });
             }
           }
         }

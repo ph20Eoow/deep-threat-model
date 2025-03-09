@@ -43,7 +43,7 @@ export function TerminalPanel({
               >
                 Findings
               </TabsTrigger>
-              <TabsTrigger
+              {/* <TabsTrigger
                 value="logs"
                 className={cn(
                   "h-7 px-3 text-xs",
@@ -51,7 +51,7 @@ export function TerminalPanel({
                 )}
               >
                 Logs
-              </TabsTrigger>
+              </TabsTrigger> */}
             </TabsList>
             <button
               onClick={onToggleExpand}
@@ -69,7 +69,7 @@ export function TerminalPanel({
             <ThreatPanel />
           </TabsContent>
 
-          <TabsContent value="logs" className="h-full m-0 p-0">
+          {/* <TabsContent value="logs" className="h-full m-0 p-0">
             <div className="h-full p-4 overflow-auto bg-black text-green-400 font-mono text-sm">
               <div className="space-y-1">
                 <div>[2023-06-15 08:12:03] INFO: System initialized</div>
@@ -94,7 +94,7 @@ export function TerminalPanel({
                 </div>
               </div>
             </div>
-          </TabsContent>
+          </TabsContent> */}
         </Tabs>
       </div>
     </div>

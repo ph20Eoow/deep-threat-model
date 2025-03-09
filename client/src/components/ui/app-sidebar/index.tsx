@@ -7,7 +7,6 @@ import {
 import Logo from "@/components/ui/app-logo";
 import { NavMain } from "./nav-main";
 import { SquareTerminal, Bot, BookOpen, Settings2 } from "lucide-react";
-import React from "react";
 export function AppSidebar() {
   const data = {
     navMain: [
