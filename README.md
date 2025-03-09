@@ -1,17 +1,13 @@
 # DeepThreatModel 
 DeepThreatModel, or Deep-TM, is a tool that utilizes a set of AI agents to compose threat models. The generated results are expected to be deeply researched, verified, and ready for inclusion in your documents.
 
+If you find this project useful, please consider starring it and share to more people.
+
 ## Features
-### AI Agent
-The bespoke DeepSearch capability:
-
-- Automatically looks up threats and attack techniques from reliable security sources (e.g., OWASP, MITRE, CVE).
-- Infrastructure awareness: if your diagram includes services from a cloud provider, it also looks up the corresponding security practice guide for that provider.
-  
-### Editor
-- Mimick Confluence/Notion block editor experience, letting you paste and generate threat modeling in a few steps
-- Support mermaid markdown 
-
+- Confluence/Notion like block style interface
+- Generate threat models with STRIDE methodology
+- Applying deep-research on mitigations
+- Support mermaid markdown as diagram input
 
 ## Quick Start with Docker Compose
 To use DeepThreatModel, you’ll need API keys for OpenAI and Google Custom Search Engine (CSE). Below are instructions on how to obtain them, followed by steps to set up the project using Docker Compose.
