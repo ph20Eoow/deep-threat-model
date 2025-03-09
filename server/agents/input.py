@@ -59,7 +59,7 @@ class InputAgent:
 
     def _init_agent(self):
         model = OpenAIModel(
-            model_name="gpt-4o-mini",
+            model_name="gpt-4o",
             api_key=config.OPENAI_API_KEY
         )
         

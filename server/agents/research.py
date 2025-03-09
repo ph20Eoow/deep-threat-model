@@ -19,14 +19,14 @@ class ResearchAgent:
 
     def _init_agent(self):
         model = OpenAIModel(
-            model_name="gpt-4o-mini",
+            model_name="gpt-4o",
             api_key=config.OPENAI_API_KEY
         )
 
         agent = Agent(
                 model=model,
                 system_prompt=[
-                    "You are a security expert specializing in threat modeling.",
+                    "You are a security expert specializing in suggesting mitigation from threat identified in threat modeling exercise",
                     "Use search_web to find information about the user's input.",
                     "Use scrape_webpage to scrape the web page for more information.",
                     "Use research_web_security_topic to research a web security topic.",

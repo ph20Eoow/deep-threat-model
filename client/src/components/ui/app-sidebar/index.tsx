@@ -18,8 +18,8 @@ export function AppSidebar() {
         isActive: true,
         items: [
           {
-            title: "Canvas",
-            url: "/canvas",
+            title: "Sandbox",
+            url: "/sandbox",
           },
         ],
       },

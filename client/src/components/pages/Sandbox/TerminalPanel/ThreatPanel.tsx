@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -65,7 +65,7 @@ const ThreatPanel = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen p-2">
+    <div className="flex flex-col h-screen">
       <div className="flex-1 p-2">
         <Table>
           <TableHeader>

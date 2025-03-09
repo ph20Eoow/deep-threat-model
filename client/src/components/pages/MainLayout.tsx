@@ -3,8 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import Dashboard from '@/components/pages/Dashboard'
 import Navbar from '@/components/ui/nav-bar'
 import { AppSidebar } from '@/components/ui/app-sidebar'
-import Canvas from '@/components/pages/Canvas'
-
+import SandboxEditor from '@/components/pages/Sandbox'
 const MainLayout = () => {
   return (
     <SidebarProvider>
@@ -14,7 +13,7 @@ const MainLayout = () => {
         <Navbar />
         <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/canvas" element={<Canvas />} />
+            <Route path="/sandbox" element={<SandboxEditor />} />
         </Routes>
         </main>
       </SidebarInset>
