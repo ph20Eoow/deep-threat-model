@@ -33,6 +33,7 @@ interface AppState {
   threats: Threat[];
   system_overview: string;
   /** Input */
+  selectedModel: "stride" | "dread";
   diagram: string;
   description: string;
   assumptions: string;
@@ -42,6 +43,7 @@ interface AppState {
 }
 
 interface AppActions {
+  setSelectedModel: (model: "stride" | "dread") => void;
   requestModeling: () => Promise<void>;
   updateUserInput: (input: string, target: "description" | "diagram" | "assumptions") => void;
   updateThreatMitigation: (threatId: string, mitigation: string) => void;
@@ -57,8 +59,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
   description: "",
   diagram: "",
   assumptions: "",
+  selectedModel: "stride",
   isProcessing: false,
   progressMessage: "",
+
+  setSelectedModel: (model: "stride" | "dread") => {
+    set({ selectedModel: model });
+  },
 
   requestModeling: async () => {
     // Reset state for new modeling session
@@ -79,7 +86,8 @@ export const useAppStore = create<AppStore>((set, get) => ({
         body: JSON.stringify({
           description: get().description,
           diagram: get().diagram,
-          assumptions: get().assumptions
+          assumptions: get().assumptions,
+          model: get().selectedModel
         })
       });
 

@@ -21,7 +21,7 @@ const ThemeToggle = ({ className, iconClassName }: ThemeToggleProps) => {
       variant="ghost"
       size="icon"
       className={cn(
-        "rounded-md transition-colors duration-200 ",
+        "rounded-md transition-colors duration-200 px-2",
         theme === "light" ? "bg-transparent" : "bg-background",
         className
       )}
