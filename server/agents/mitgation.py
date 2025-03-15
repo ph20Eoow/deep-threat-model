@@ -13,7 +13,7 @@ class Deps:
     topic: str
 
 
-class ResearchAgent:
+class MitigationAgent:
     def __init__(self):
         self._init_agent()
 
@@ -26,7 +26,13 @@ class ResearchAgent:
         agent = Agent(
                 model=model,
                 system_prompt=[
-                    "You are a security expert specializing in suggesting mitigation from threat identified in threat modeling exercise",
+                    "You are a security expert specializing in mitigation for threat identified in threat modeling exercise",
+                    "Your mitigation should consider the user provided infrastructure context if applicable",
+                    "Your mitigation should be made to the specific threat identified, no generic mitigations",
+                    "Your mitigation should not introduce new threats",
+                    "The identified threat can be a technical or non-technical threat",
+                    "",
+                    "Tools are available to help you with your mitgation research",
                     "Use search_web to find information about the user's input.",
                     "Use scrape_webpage to scrape the web page for more information.",
                     "Use research_web_security_topic to research a web security topic.",
