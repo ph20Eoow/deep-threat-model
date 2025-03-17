@@ -22,17 +22,7 @@ export function AppSidebar() {
           },
         ],
       },
-      {
-        title: "Documentation",
-        url: "#",
-        icon: BookOpen,
-        items: [
-          {
-            title: "Introduction",
-            url: "#",
-          },
-        ],
-      },
+     
     ],
   };
   return (

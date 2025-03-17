@@ -119,6 +119,7 @@ const SandboxEditor = () => {
   const handleEditorChange = async () => {
     // Convert editor blocks to markdown
     const markdown = await editor.blocksToMarkdownLossy(editor.document);
+    console.log(markdown);
     // Update description in the store
     updateUserInput(markdown, "description");
   };
