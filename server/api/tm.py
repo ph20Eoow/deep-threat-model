@@ -4,6 +4,7 @@ from agents.input import InputAgent, Relationship
 from agents.mitgation import MitigationAgent
 from agents.relationship import RelationshipAgent
 from agents.stride import StrideAgent
+from agents.stride import Threat
 from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import AsyncGenerator, List
@@ -26,12 +27,16 @@ class ChatRequest(BaseModel):
     description: str
     assumptions: str
 
-class ResearchRequest(BaseModel):
-    user_input: str
-
+class MitigationRequest(BaseModel):
+    threat: Threat
+    context: str
 class StrideRequest(BaseModel):
     relationships: List[Relationship]
     context: str
+    
+class ThreatModelRequest(BaseModel):
+    user_input: str
+
 @router.get("/")
 async def get_threats():
     return {"message": "Welcome to the Threat Modeling API!"}
@@ -124,8 +129,14 @@ async def init_threat_model(request: ChatRequest):
     return result.data
 
 # Dev endpoint
+@router.post("/mitigation")
+async def research_mitigation(request: MitigationRequest):
+    agent = MitigationAgent()
+    result = await agent.run(request.threat, request.context)
+    return result.data
+
 @router.post("/relationship")
-async def research_threat_model(request: ResearchRequest):
+async def research_threat_model(request: MitigationRequest):
     agent = RelationshipAgent()
     result = await agent.run(request.user_input)
     return result.data
@@ -141,7 +152,7 @@ async def pipeline_stride(request: StrideRequest):
     return results
 
 
-async def relationship_stride_stream(request: ResearchRequest) -> AsyncGenerator[str, None]:
+async def relationship_stride_stream(request: MitigationRequest) -> AsyncGenerator[str, None]:
     """
     Streaming endpoint that orchestrates the relationship extraction and STRIDE threat generation
     with real-time updates as each threat is identified.
@@ -201,44 +212,38 @@ async def relationship_stride_stream(request: ResearchRequest) -> AsyncGenerator
         mitigation_agent = MitigationAgent()
         for i, threat in enumerate(all_threats):
             # Notify client which threat we're researching mitigations for
-            yield f"data: {json.dumps({'type': 'research_started', 'threat_id': threat.id, 'message': f'Researching mitigation for: {threat.name}'})}\n\n"
+            yield f"data: {json.dumps({'type': 'mitigation_started', 'threat_id': threat.id, 'message': f'Researching mitigation for: {threat.name}'})}\n\n"
             
             try:
-                # Create a mitigation research prompt based on the threat
-                mitigation_prompt = (
-                    f"Research mitigation strategies for the following threat:\n\n"
-                    f"Name: {threat.name}\n"
-                    f"Category: {threat.category}\n"
-                    f"Relationship: {threat.scope.source} {threat.scope.direction} {threat.scope.target}\n"
-                    f"Description: {threat.scope.description}\n"
-                    f"Threat Details: {threat.threat}\n"
-                    f"Impacts: {threat.impacts}\n"
-                    f"Severity: {threat.severity}\n"
-                    f"Context: {context}\n\n"
-                    f"Provide specific, actionable mitigation strategies for this threat."
-                )
+                # Call the mitigation agent with the threat and context
+                mitigation_result = await mitigation_agent.run(threat, context)
                 
-                # Call the mitigation agent with the created prompt
-                mitigation_result = await mitigation_agent.run(mitigation_prompt)
+                # Extract mitigation content and sources from the result
+                content = "No specific mitigation found."
+                sources = []
                 
-                # Extract mitigation content from the result
-                mitigation = "No specific mitigation found."
                 if hasattr(mitigation_result, 'data'):
-                    if hasattr(mitigation_result.data, 'mitigation'):
-                        mitigation = mitigation_result.data.mitigation
-                    elif hasattr(mitigation_result.data, 'content'):
-                        mitigation = mitigation_result.data.content
-                    elif isinstance(mitigation_result.data, str):
-                        mitigation = mitigation_result.data
+                    data = mitigation_result.data
+                    if hasattr(data, 'content'):
+                        content = data.content
+                    if hasattr(data, 'sources'):
+                        sources = data.sources
                 
-                # Stream the mitigation results
-                yield f"data: {json.dumps({'type': 'research_complete', 'threat_id': threat.id, 'mitigation': mitigation})}\n\n"
+                # Send structured format with nested mitigation object to match client expectations
+                yield f"data: {json.dumps({
+                    'type': 'mitigation_complete', 
+                    'threat_id': threat.id, 
+                    'mitigation': {
+                        'content': content, 
+                        'sources': sources
+                    }
+                })}\n\n"
                 
                 # Small delay between mitigations
                 await asyncio.sleep(0.2)
                 
             except Exception as e:
-                yield f"data: {json.dumps({'type': 'research_error', 'threat_id': threat.id, 'error': str(e)})}\n\n"
+                yield f"data: {json.dumps({'type': 'mitigation_error', 'threat_id': threat.id, 'error': str(e)})}\n\n"
         
         # Step 5: Signal completion and return summary
         yield f"data: {json.dumps({'type': 'process_complete', 'message': 'Threat modeling and mitigation research complete', 'total_threats': len(all_threats)})}\n\n"
@@ -248,7 +253,7 @@ async def relationship_stride_stream(request: ResearchRequest) -> AsyncGenerator
         yield f"data: {json.dumps({'type': 'error', 'message': f'Stream processing error: {str(e)}'})}\n\n"
 
 @router.post("/stream/stride")
-async def stream_stride_threats(request: ResearchRequest):
+async def stream_stride_threats(request: ThreatModelRequest):
     """
     Streaming endpoint for the relationship extraction and STRIDE threat generation process.
     """
