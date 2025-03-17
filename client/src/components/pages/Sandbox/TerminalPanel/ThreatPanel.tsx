@@ -56,8 +56,8 @@ const ThreatPanel = () => {
     }
     if (threat.mitigation) {
       return (
-        <p className="max-w-md truncate" title={threat.mitigation}>
-          {threat.mitigation}
+        <p className="w-[200px] truncate" title={threat.mitigation.content}>
+          {threat.mitigation.content}
         </p>
       );
     }
@@ -65,15 +65,15 @@ const ThreatPanel = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen">
-      <div className="flex-1 p-2">
+    <div className="flex flex-col h-full">
+      <div className="flex flex-1">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableCell className="font-medium">Scope</TableCell>
-              <TableCell className="text-left">Impacts</TableCell>
-              <TableCell className="text-left">Techniques</TableCell>
-              <TableCell className="text-left">Mitigation</TableCell>
+            <TableRow className="bg-slate-100 dark:bg-slate-800">
+              <TableCell className="font-medium">Vector</TableCell>
+              <TableCell className="font-medium text-left">Impacts</TableCell>
+              <TableCell className="font-medium text-left">Category</TableCell>
+              <TableCell className="font-medium text-left">Mitigation</TableCell>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -91,7 +91,7 @@ const ThreatPanel = () => {
                   <p>{renderList(item.impacts)}</p>
                 </TableCell>
                 <TableCell className="text-left">
-                  <p>{renderList(item.techniques)}</p>
+                  <p>{renderList(item.category)}</p>
                 </TableCell>
                 <TableCell className="text-left">
                   {renderMitigation(item)}

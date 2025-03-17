@@ -1,6 +1,6 @@
 import { config } from "@/config";
 import { create } from "zustand";
-import { StreamResponse, isInitialResultsResponse, isResearchStartedResponse, isResearchCompleteResponse, isProcessCompleteResponse, isErrorResponse, isDebugResponse } from "@/types/stream";
+import { StreamResponse, isInitialResultsResponse, isMitigationStartedResponse, isMitigationCompleteResponse, isProcessCompleteResponse, isErrorResponse, isDebugResponse, isRelationshipsResponse, isAnalyzingRelationshipResponse, isThreatIdentifiedResponse, isStatusResponse } from "@/types/stream";
 
 interface ThreatScope {
   source: string;
@@ -14,24 +14,24 @@ export interface Threat {
   name: string;
   scope: ThreatScope;
   impacts: string;
-  techniques: string;
-  mitigation?: string;
+  category: string;
+  mitigation?: {
+    content: string;
+    sources: string[];
+  };
   summary: string;
   severity: string;
   likelihood: string;
   researchStatus: 'pending' | 'researching' | 'complete';
 }
 
-interface TMResponse {
-  system_overview: string;
-  threat_scenarios: Threat[];
-}
 
 interface AppState {
   /** Output */
   selectedThreat: Threat | null;
   threats: Threat[];
   system_overview: string;
+  progressMessages: string[];
   /** Input */
   selectedModel: "stride" | "dread";
   diagram: string;
@@ -46,7 +46,7 @@ interface AppActions {
   setSelectedModel: (model: "stride" | "dread") => void;
   requestModeling: () => Promise<void>;
   updateUserInput: (input: string, target: "description" | "diagram" | "assumptions") => void;
-  updateThreatMitigation: (threatId: string, mitigation: string) => void;
+  updateThreatMitigation: (threatId: string, mitigation: string, sources: string[]) => void;
   updateThreatResearchStatus: (threatId: string, status: 'pending' | 'researching' | 'complete') => void;
 }
 
@@ -62,7 +62,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   selectedModel: "stride",
   isProcessing: false,
   progressMessage: "",
-
+  progressMessages: [],
   setSelectedModel: (model: "stride" | "dread") => {
     set({ selectedModel: model });
   },
@@ -78,16 +78,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
     try {
       // Create POST request with fetch
-      const response = await fetch(`${config.apiBaseUrl}/api/tm/stream`, {
+      const response = await fetch(`${config.apiBaseUrl}/api/tm/stream/${get().selectedModel}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          description: get().description,
-          diagram: get().diagram,
-          assumptions: get().assumptions,
-          model: get().selectedModel
+          user_input: get().description,
         })
       });
 
@@ -100,6 +97,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const reader = response.body!.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
+      let allThreats: Threat[] = [];
 
       // Read and process the stream
       while (true) {
@@ -124,6 +122,31 @@ export const useAppStore = create<AppStore>((set, get) => ({
               if (isDebugResponse(data)) {
                 console.log("Debug:", data.message);
               }
+              else if (isStatusResponse(data)) {
+                set({ progressMessage: data.message });
+              }
+              else if (isRelationshipsResponse(data)) {
+                // Handle extracted relationships
+                console.log("Relationships:", data.data);
+                set({ 
+                  progressMessage: `Found ${data.data.length} relationships to analyze...`
+                });
+              }
+              else if (isAnalyzingRelationshipResponse(data)) {
+                // Update progress when analyzing a relationship
+                set({ 
+                  progressMessage: `Analyzing relationship ${data.index + 1}: ${data.relationship.source} ${data.relationship.direction} ${data.relationship.target}`
+                });
+              }
+              else if (isThreatIdentifiedResponse(data)) {
+                // Add the new threat to our collection
+                const threat = {
+                  ...data.threat,
+                  researchStatus: 'pending' as const  // Change from 'complete' to 'pending'
+                };
+                allThreats.push(threat);
+                set({ threats: [...allThreats] });
+              }
               else if (isInitialResultsResponse(data)) {
                 set({ 
                   system_overview: data.data.system_overview,
@@ -134,31 +157,30 @@ export const useAppStore = create<AppStore>((set, get) => ({
                   progressMessage: "Initial threat modeling complete. Starting detailed research..."
                 });
               }
-              else if (isResearchStartedResponse(data)) {
-                set({ 
-                  progressMessage: data.message,
-                });
+              else if (isMitigationStartedResponse(data)) {
+                set({ progressMessage: data.message });
                 get().updateThreatResearchStatus(data.threat_id, 'researching');
               }
-              else if (isResearchCompleteResponse(data)) {
-                get().updateThreatMitigation(data.threat_id, data.mitigation);
+              else if (isMitigationCompleteResponse(data)) {
+                console.log("Mitigation complete:", data);
+                get().updateThreatMitigation(data.threat_id, data.mitigation.content, data.mitigation.sources);
                 get().updateThreatResearchStatus(data.threat_id, 'complete');
               }
               else if (isProcessCompleteResponse(data)) {
                 set({ 
                   isProcessing: false,
-                  progressMessage: data.message
+                  progressMessage: data.message + " - " + data.total_threats
                 });
               }
               else if (isErrorResponse(data)) {
                 console.error("Server error:", data.message);
                 set({ 
                   progressMessage: `Error: ${data.message}`,
+                  isProcessing: false
                 });
               }
             } catch (e) {
               console.error("Error parsing SSE message:", e, message);
-            } finally {
               set({ isProcessing: false });
             }
           }
@@ -177,11 +199,11 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set({ [target]: input });
   },
 
-  updateThreatMitigation: (threatId: string, mitigation: string) => {
+  updateThreatMitigation: (threatId: string, content: string, sources: string[]) => {
     set(state => ({
       threats: state.threats.map(threat => 
         threat.id === threatId 
-          ? { ...threat, mitigation } 
+          ? { ...threat, mitigation: { content, sources } } 
           : threat
       )
     }));

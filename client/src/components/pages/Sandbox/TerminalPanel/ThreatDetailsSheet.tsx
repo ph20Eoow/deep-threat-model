@@ -55,6 +55,12 @@ const ThreatDetailsSheet: React.FC<ThreatDetailsSheetProps> = ({
         
         <ScrollArea className="mt-6 h-[calc(100vh-180px)]">
           <div className="space-y-6 pr-4">
+          <div>
+              <h3 className="text-lg font-medium mb-2">Vector</h3>
+              <div className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded">
+                {threat.scope.source} {threat.scope.direction} {threat.scope.target}
+              </div>
+            </div>
             <div>
               <h3 className="text-lg font-medium mb-2">Severity</h3>
               <div className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded">
@@ -77,9 +83,9 @@ const ThreatDetailsSheet: React.FC<ThreatDetailsSheetProps> = ({
             </div>
             
             <div>
-              <h3 className="text-lg font-medium mb-2">Techniques</h3>
+              <h3 className="text-lg font-medium mb-2">Threat Category</h3>
               <div className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded">
-                {renderList(threat.techniques)}
+                {threat.category}
               </div>
             </div>
             
@@ -97,8 +103,27 @@ const ThreatDetailsSheet: React.FC<ThreatDetailsSheetProps> = ({
                   <Markdown 
                     remarkPlugins={[remarkGfm]}
                   >
-                    {threat.mitigation || "No mitigation data available"}
+                    {threat.mitigation?.content || "No mitigation data available"}
                   </Markdown>
+                )}
+              </div>
+            </div>
+            <div>
+              <h3 className="text-lg font-medium mb-2">Sources</h3>
+              <div className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded">
+                {threat.researchStatus === 'researching' ? (
+                  <div className="flex items-center text-blue-600">
+                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                    <span>Researching sources...</span>
+                  </div>
+                ) : threat.researchStatus === 'pending' ? (
+                  <span className="text-gray-500">Mitigation research pending...</span>
+                ) : (
+                  <ul className="list-disc pl-5 space-y-1">
+                   {threat.mitigation?.sources && threat.mitigation.sources.map((source, i) => (
+                      <li key={i}>{source}</li>
+                    ))}
+                  </ul>
                 )}
               </div>
             </div>

@@ -63,38 +63,11 @@ export function TerminalPanel({
         </Tabs>
       </div>
 
-      <div className="h-[40vh] overflow-hidden">
+      <div className="h-[calc(100vh-100px)] overflow-y-scroll">
         <Tabs value={activeTab} className="h-full">
-          <TabsContent value="findings" className="h-full m-0 p-0">
+          <TabsContent value="findings" className="flex-1 h-full m-0 p-0">
             <ThreatPanel />
           </TabsContent>
-
-          {/* <TabsContent value="logs" className="h-full m-0 p-0">
-            <div className="h-full p-4 overflow-auto bg-black text-green-400 font-mono text-sm">
-              <div className="space-y-1">
-                <div>[2023-06-15 08:12:03] INFO: System initialized</div>
-                <div>
-                  [2023-06-15 08:12:04] DEBUG: Connection established to
-                  database
-                </div>
-                <div>
-                  [2023-06-15 08:12:05] INFO: User authentication service
-                  started
-                </div>
-                <div>
-                  [2023-06-15 08:12:15] WARNING: Rate limit threshold
-                  approaching
-                </div>
-                <div>
-                  [2023-06-15 08:13:22] ERROR: Failed to connect to external API
-                </div>
-                <div>
-                  [2023-06-15 08:14:03] INFO: Retry successful, connection
-                  established
-                </div>
-              </div>
-            </div>
-          </TabsContent> */}
         </Tabs>
       </div>
     </div>

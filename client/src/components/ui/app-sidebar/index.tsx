@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/sidebar";
 import Logo from "@/components/ui/app-logo";
 import { NavMain } from "./nav-main";
-import { SquareTerminal, Bot, BookOpen, Settings2 } from "lucide-react";
+import { SquareTerminal, BookOpen } from "lucide-react";
 export function AppSidebar() {
   const data = {
     navMain: [
@@ -29,17 +29,6 @@ export function AppSidebar() {
         items: [
           {
             title: "Introduction",
-            url: "#",
-          },
-        ],
-      },
-      {
-        title: "Settings",
-        url: "#",
-        icon: Settings2,
-        items: [
-          {
-            title: "General",
             url: "#",
           },
         ],
