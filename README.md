@@ -1,13 +1,23 @@
 # DeepThreatModel 
-DeepThreatModel, or Deep-TM, is a tool that utilizes a set of AI agents to compose threat models. The generated results are expected to be deeply researched, verified, and ready for inclusion in your documents.
+DeepThreatModel, or Deep-TM, use of multiple AI agents tool to compose a threat model. The modeling results are expected to be deeply researched, verified.
 
-If you find this project useful, please consider starring it and share to more people.
+⭐️ If you find this project useful, please consider starring it and share to more people.⭐️
+
+![demo](docs/how-to/modeling/image-2.png)
 
 ## Features
+- Multi-agent architecture
 - Confluence/Notion like block style interface
 - Generate threat models with STRIDE methodology
 - Applying deep-research on mitigations
 - Support mermaid markdown as diagram input
+
+## Roadmaps
+- [x] Build the multi agent architecture
+- [x] Build an intuitive editor to gather user inputs (e.g. Diagram, Design, Assumption, etc) 
+- [x] Generate threat mitigation with deep-research agent
+- [x] Adding support STRIDE methodology
+- [ ] Adding support DREAD methodology 
 
 ## Quick Start with Docker Compose
 To use DeepThreatModel, you’ll need API keys for OpenAI and Google Custom Search Engine (CSE). Below are instructions on how to obtain them, followed by steps to set up the project using Docker Compose.
@@ -41,3 +51,9 @@ Deep-ThreatModel couldn't have been built without the help of great software alr
 - [mermaidjs](https://github.com/mermaid-js/mermaid)
 - [BlockNote](https://github.com/TypeCellOS/BlockNote)
 - [pydantic-ai](https://github.com/pydantic/pydantic-ai)
+
+## Contributing
+All kind of contributions are welcome. I don't have any "Developer Guide" at this moment. For any breaking changes, feel free to create an issue and leave your thoughts there.
+
+## License
+This project is licensed under the MIT License
