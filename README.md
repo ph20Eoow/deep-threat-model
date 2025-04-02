@@ -1,9 +1,9 @@
-# DeepThreatModel 
-DeepThreatModel, or Deep-TM, use of multiple AI agents tool to compose a threat model. The modeling results are expected to be deeply researched, verified.
+# Deep-ThreatModel 
+Deep-TreatModel is an advanced threat modeling tool that leverages multiple AI agents to craft comprehensive and reliable threat models. By distributing the workload across specialized agents, Deep-TM meticulously analyzes design documents, identifies threats using the STRIDE framework, and researches mitigations from authoritative sources like OWASP, and MITRE. This collaborative approach ensures that the resulting threat models are not only deeply researched but also thoroughly verified, providing you with dependable insights tailored to your system’s architecture.
 
 ⭐️ If you find this project useful, please consider starring it and share to more people.⭐️
 
-![demo](docs/how-to/modeling/image-2.png)
+![demo](docs/asset/screenshots/image-2.png)
 
 ## Features
 - Multi-agent architecture
@@ -18,33 +18,10 @@ DeepThreatModel, or Deep-TM, use of multiple AI agents tool to compose a threat 
 - [x] Generate threat mitigation with deep-research agent
 - [x] Adding support STRIDE methodology
 - [ ] Adding support DREAD methodology 
+- [ ] Allow authoritive source preferences
 
-## Quick Start with Docker Compose
-To use DeepThreatModel, you’ll need API keys for OpenAI and Google Custom Search Engine (CSE). Below are instructions on how to obtain them, followed by steps to set up the project using Docker Compose.
-
-### Retrieving API Keys
-1. OpenAI API Key:
-   - Sign up for an account at OpenAI.
-   - Once logged in, navigate to the API section and generate a new API key.
-   - Copy this key for use in the .env file.
-2. Google API Key and CSE ID:
-   - Go to the Google Cloud Console.
-   - Create a new project (or use an existing one).
-   - Enable the Custom Search API in the API Library.
-   - Generate an API key under Credentials > Create Credentials > API Key.
-   - Set up a Custom Search Engine (CSE) at Google CSE and obtain your CSE ID.
-   - Copy both the API key and CSE ID for use in the .env file.
-
-### Setup the container
-1. Clone or Download the Project 
-2. Create your `.env`
-    ```bash
-        OPENAI_API_KEY=your_actual_openai_api_key
-        GOOGLE_API_KEY=your_actual_google_api_key
-        GOOGLE_CSE_ID=your_actual_google_cse_id
-    ```
-3. Build and Start the Containers `docker compose up -d`
-4. Access at `http://localhost:5173`
+## Getting Started
+Please go to our [Getting Started Page](https://github.com/ph20Eoow/deep-threat-model/wiki/Getting-Started) in the wiki to checkout the quick start guide
 
 ## Acknowledgements
 Deep-ThreatModel couldn't have been built without the help of great software already available from the community. Thank you.
@@ -53,7 +30,7 @@ Deep-ThreatModel couldn't have been built without the help of great software alr
 - [pydantic-ai](https://github.com/pydantic/pydantic-ai)
 
 ## Contributing
-All kind of contributions are welcome. I don't have any "Developer Guide" at this moment. For any breaking changes, feel free to create an issue and leave your thoughts there.
+All kind of contributions are welcome. I don't have any "Developer Guide" at this moment. For any breaking changes, feel free to create an issue and leave your thoughts there; Feature requests are welcome too.
 
 ## License
 This project is licensed under the MIT License
