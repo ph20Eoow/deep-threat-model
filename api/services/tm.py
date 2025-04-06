@@ -5,7 +5,7 @@ from api.agents.stride import StrideAgent
 from api.agents.stride import Threat
 from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import AsyncGenerator, List
+from typing import AsyncGenerator, List, Dict, Any, Optional
 import json
 import asyncio
 
@@ -32,6 +32,7 @@ class StrideRequest(BaseModel):
     
 class ThreatModelRequest(BaseModel):
     user_input: str
+    api_keys: Optional[Dict[str, str]] = Field(default_factory=dict)
 
 def pydantic_to_json(obj):
     if hasattr(obj, 'model_dump'):
@@ -40,7 +41,7 @@ def pydantic_to_json(obj):
         return obj.dict()
     return obj
 
-async def analyze(request: MitigationRequest) -> AsyncGenerator[str, None]:
+async def analyze(request: ThreatModelRequest) -> AsyncGenerator[str, None]:
     """
     Streaming endpoint that orchestrates the relationship extraction and STRIDE threat generation
     with real-time updates as each threat is identified.
@@ -49,10 +50,19 @@ async def analyze(request: MitigationRequest) -> AsyncGenerator[str, None]:
     yield f"data: {json.dumps({'type': 'debug', 'message': 'Stream started'})}\n\n"
     
     try:
-        # Step 1: Extract relationships using RelationshipAgent
+        # Check for required API keys if provided
+        if request.api_keys:
+            if not request.api_keys.get('openai_api_key'):
+                yield f"data: {json.dumps({'type': 'error', 'message': 'OpenAI API key is required'})}\n\n"
+                return
+            
+            # Log that we're using client-provided keys
+            yield f"data: {json.dumps({'type': 'debug', 'message': 'Using client-provided API keys'})}\n\n"
+        
+        # Step 1: Extract relationships using RelationshipAgent with API keys
         yield f"data: {json.dumps({'type': 'status', 'message': 'Extracting relationships from diagram and description...'})}\n\n"
         
-        relationship_agent = RelationshipAgent()
+        relationship_agent = RelationshipAgent(api_keys=request.api_keys)
         relationship_result = await relationship_agent.run(request.user_input)
         
         if not hasattr(relationship_result, 'data') or not hasattr(relationship_result.data, 'relationships'):
@@ -68,8 +78,8 @@ async def analyze(request: MitigationRequest) -> AsyncGenerator[str, None]:
         # Use context from request if provided, otherwise use context from relationship result
         yield f"data: {json.dumps({'type': 'debug', 'message': f'Using context: {context}'})}\n\n"
         
-        # Step 3: Analyze each relationship with STRIDE
-        stride_agent = StrideAgent()
+        # Step 3: Analyze each relationship with STRIDE, passing API keys
+        stride_agent = StrideAgent(api_keys=request.api_keys)
         all_threats = []
         
         for i, relationship in enumerate(relationships):
@@ -94,10 +104,10 @@ async def analyze(request: MitigationRequest) -> AsyncGenerator[str, None]:
             except Exception as e:
                 yield f"data: {json.dumps({'type': 'relationship_error', 'index': i, 'error': str(e)})}\n\n"
         
-        # Step 4: Research for mitigation for each threat
+        # Step 4: Research for mitigation for each threat, passing API keys
         yield f"data: {json.dumps({'type': 'status', 'message': f'Starting mitigation research for {len(all_threats)} threats...'})}\n\n"
         
-        mitigation_agent = MitigationAgent()
+        mitigation_agent = MitigationAgent(api_keys=request.api_keys)
         for i, threat in enumerate(all_threats):
             # Notify client which threat we're researching mitigations for
             yield f"data: {json.dumps({'type': 'mitigation_started', 'threat_id': threat.id, 'message': f'Researching mitigation for: {threat.name}'})}\n\n"

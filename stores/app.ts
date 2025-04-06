@@ -86,6 +86,15 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   requestModeling: async () => {
+    // Validate API keys
+    if (!get().apiKeys.openai || !get().apiKeys.google_cse || !get().apiKeys.google_cse_id) {
+      set({ 
+        isProcessing: false,
+        progressMessage: "Error: API keys are required. Please provide it in the settings."
+      });
+      return;
+    }
+
     // Reset state for new modeling session
     set({ 
       threats: [], 
@@ -104,6 +113,11 @@ export const useAppStore = create<AppStore>((set, get) => ({
         },
         body: JSON.stringify({
           user_input: get().description,
+          api_keys: {
+            openai_api_key: get().apiKeys.openai,
+            google_api_key: get().apiKeys.google_cse,
+            google_cse_id: get().apiKeys.google_cse_id
+          }
         }),
         signal: get().abortController?.signal
       });

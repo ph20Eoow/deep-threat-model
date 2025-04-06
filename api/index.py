@@ -28,16 +28,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class ThreatModelRequest(BaseModel):
-    user_input: str
-
 router = APIRouter(prefix="/api", tags=["Core API"])
 
 @router.post("/stream/stride")
-async def stream_stride_threats(request: ThreatModelRequest):
+async def stream_stride_threats(request: tm.ThreatModelRequest):
     """
     Streaming endpoint for the relationship extraction and STRIDE threat generation process.
     """
+    print(f"Received request: {request}")
     return StreamingResponse(
         tm.analyze(request),
         media_type="text/event-stream"

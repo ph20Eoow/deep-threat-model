@@ -3,7 +3,7 @@ from pydantic_ai import Agent, RunContext
 from pydantic_ai.models.openai import OpenAIModel
 from api.config import config
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from .tools.web_scraper import WebScraperTool, WebScraperInput, WebScraperOutput
 from .tools.google_search import GoogleSearchTool, GoogleSearchInput, GoogleSearchOutput
 from .stride import Threat
@@ -14,17 +14,20 @@ class Deps:
     topic: str
 
 class MitigationResponse(BaseModel):
-    content: str = Field(description="The mitigation strategy to appl")
+    content: str = Field(description="The mitigation strategy to apply to the threat")
     sources: List[str] = Field(default_factory=list, description="List of sources for the mitigation strategies")
 
 class MitigationAgent:
-    def __init__(self):
+    def __init__(self, api_keys: Dict[str, str] = None):
         self._init_agent()
+        self.api_keys = api_keys
 
     def _init_agent(self):
+        openai_api_key = self.api_keys.get("openai_api_key", config.OPENAI_API_KEY)
+        
         model = OpenAIModel(
             model_name="gpt-4o",
-            api_key=config.OPENAI_API_KEY
+            api_key=openai_api_key
         )
 
         agent = Agent(

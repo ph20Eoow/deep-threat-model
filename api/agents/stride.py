@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional, Set
+from typing import List, Optional, Set, Dict, Any
 from pydantic import BaseModel, Field, field_validator
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.models.openai import OpenAIModel
@@ -63,13 +63,16 @@ class Deps:
     relationship: Relationship
 
 class StrideAgent:
-    def __init__(self):
+    def __init__(self, api_keys: Dict[str, str] = None):
         self._init_agent()
+        self.api_keys = api_keys
 
     def _init_agent(self):
+        openai_api_key = self.api_keys.get("openai_api_key", config.OPENAI_API_KEY)
+        
         model = OpenAIModel(
             model_name="gpt-4o-mini",
-            api_key=config.OPENAI_API_KEY
+            api_key=openai_api_key
         )
 
         agent = Agent(
