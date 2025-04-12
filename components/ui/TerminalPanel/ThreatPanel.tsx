@@ -65,10 +65,10 @@ const ThreatPanel = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex flex-1">
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="overflow-auto h-full">
         <Table>
-          <TableHeader>
+          <TableHeader className="sticky top-0 z-10 bg-background">
             <TableRow className="bg-slate-100 dark:bg-slate-800">
               <TableCell className="font-medium">Vector</TableCell>
               <TableCell className="font-medium text-left">Impacts</TableCell>

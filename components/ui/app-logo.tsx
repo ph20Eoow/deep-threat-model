@@ -9,9 +9,7 @@ const Logo = () => {
       className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex-row"
     >
       <div className={cn("font-mono px-2")}>Deep-ThreatModel</div>
-      <Link href="https://github.com/ph20Eoow/deep-threat-model">
-          <FaGithub />
-        </Link>
+      
     </SidebarMenuButton>
   );
 };

@@ -3,6 +3,7 @@ import { useTheme } from "@/components/providers/theme-provider";
 import { BsSun, BsMoon } from "react-icons/bs";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
+import { MoonIcon, SunIcon } from "lucide-react";
 
 interface ThemeToggleProps {
   className?: string;
@@ -29,9 +30,9 @@ const ThemeToggle = ({ className, iconClassName }: ThemeToggleProps) => {
       title={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
     >
       {theme === "light" ? (
-        <BsMoon className={cn("w-3 h-3 text-muted-foreground", iconClassName)} />
+        <MoonIcon className={cn("text-muted-foreground", iconClassName)} />
       ) : (
-        <BsSun className={cn("w-3 h-3 text-muted-foreground", iconClassName)} />
+        <SunIcon className={cn("text-muted-foreground", iconClassName)} />
       )}
     </Button>
   );

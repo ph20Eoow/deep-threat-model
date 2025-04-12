@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   Sidebar,
   SidebarContent,
@@ -6,6 +6,11 @@ import {
   SidebarGroup,
   SidebarHeader,
   SidebarGroupLabel,
+  SidebarGroupAction,
+  SidebarMenu,
+  SidebarGroupContent,
+  SidebarMenuItem,
+  SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import Logo from "@/components/ui/app-logo";
 import { NavMain } from "./nav-main";
@@ -16,13 +21,28 @@ import { FaGithub } from "react-icons/fa";
 import Link from "next/link";
 export function AppSidebar() {
   return (
-    <Sidebar collapsible="icon" >
+    <Sidebar collapsible="icon">
       <SidebarHeader>
         <Logo />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <BYOL />
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <BYOL />
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link href="https://github.com/ph20Eoow/deep-threat-model">
+                    <FaGithub size={20} />
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter />

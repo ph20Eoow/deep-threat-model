@@ -53,7 +53,7 @@ export default function Home() {
   return (
     <div className="flex flex-col h-full">
       <NavBar />
-      <ResizablePanelGroup direction="vertical" className="h-full">
+      <ResizablePanelGroup direction="horizontal" className="h-full">
         <ResizablePanel defaultSize={75} minSize={30}>
           <div className="p-2 h-full">
             <ScrollArea className="h-[calc(100vh-100px)]">
@@ -67,7 +67,7 @@ export default function Home() {
         <ResizablePanel 
           ref={panelRef}
           defaultSize={25} 
-          minSize={5}
+          minSize={20}
           collapsible={true}
           collapsedSize={5}
         >
