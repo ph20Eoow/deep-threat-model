@@ -41,12 +41,13 @@ async def stream_stride_threats(request: tm.ThreatModelRequest):
         media_type="text/event-stream"
     )
 # Include router
+@router.get("/health")
+def health_check():
+    return {"status": "ok"}
+
 app.include_router(router)
 
 # Add a health check endpoint
-@app.get("/health")
-def health_check():
-    return {"status": "ok"}
 
 
 if __name__ == "__main__":
