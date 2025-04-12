@@ -19,8 +19,8 @@ class MitigationResponse(BaseModel):
 
 class MitigationAgent:
     def __init__(self, api_keys: Dict[str, str] = None):
-        self._init_agent()
         self.api_keys = api_keys
+        self._init_agent()
 
     def _init_agent(self):
         openai_api_key = self.api_keys.get("openai_api_key", config.OPENAI_API_KEY)

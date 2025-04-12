@@ -34,8 +34,8 @@ class Deps:
 
 class RelationshipAgent:
     def __init__(self, api_keys: Dict[str, str] = None):
-        self._init_agent()
         self.api_keys = api_keys
+        self._init_agent()
 
     def _init_agent(self):
         openai_api_key = self.api_keys.get("openai_api_key", config.OPENAI_API_KEY)
@@ -49,10 +49,21 @@ class RelationshipAgent:
             model=model,
             system_prompt=[
                 "You are a specialized infrastructure and application security expert.",
-                "Your task are:",
-                "1. RELATIONSHIPS: Identify relationships between components from the user input (such as 'ec2 <- internet' or 'database → API').",
-                "2. CONTEXT: Provide a contextual summary of the user input with all the relevant technical details and business context. No security analysis is required, just a technical summary.",
-                "Provide your analysis in a structured format that will be used for deeper security research."
+                "Your tasks are:",
+                "1. RELATIONSHIPS: Identify relationships between components from the user input with technical specificity:",
+                "   - Identify exact interfaces and data flows (e.g., 'Client authentication to Authorization Server via HTTPS')",
+                "   - Specify the technical protocols or methods used in each relationship",
+                "   - Include trust assumptions and security boundaries being crossed",
+                "   - Note specific data elements or credentials being exchanged",
+                "",
+                "2. CONTEXT: Provide a detailed technical summary including:",
+                "   - Specific technologies and protocols mentioned or implied",
+                "   - Authentication and authorization mechanisms",
+                "   - Data types being protected or transmitted",
+                "   - Technical environment and implementation details",
+                "",
+                "Be technically precise without making assumptions not present in the input.",
+                "Identify as many specific, technical relationships as possible to enable detailed threat modeling."
             ],
             result_type=RelationshipModelOutput,
             deps_type=str,

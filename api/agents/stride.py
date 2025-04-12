@@ -22,10 +22,12 @@ class StrideCategory(str, Enum):
 class Threat(BaseModel):
     id: str = Field(..., description="Unique identifier for this threat")
     category: StrideCategory = Field(..., description="Threat category")
-    name: str = Field(..., description="Short descriptive name for this threat")
+    name: str = Field(..., description="Specific name describing the attack method")
     scope: Relationship = Field(..., description="Specific relationships affected by this threat")
-    impacts: str = Field( ..., description="Potential security impacts or consequences for this scenario")
-    threat: str = Field(..., description="Brief summary of this specific threat")
+    impacts: str = Field(..., description="Potential security impacts or consequences for this scenario")
+    threat: str = Field(..., description="Technical description of this specific threat")
+    attack_vectors: str = Field(..., description="Specific methods an attacker would use to exploit this vulnerability")
+    prerequisites: str = Field(..., description="Conditions necessary for this attack to be possible")
     severity: str = Field(..., description="Estimated severity (Critical, High, Medium, Low)")
     likelihood: str = Field(..., description="Estimated likelihood (High, Medium, Low)")
 
@@ -64,14 +66,14 @@ class Deps:
 
 class StrideAgent:
     def __init__(self, api_keys: Dict[str, str] = None):
-        self._init_agent()
         self.api_keys = api_keys
+        self._init_agent()
 
     def _init_agent(self):
         openai_api_key = self.api_keys.get("openai_api_key", config.OPENAI_API_KEY)
         
         model = OpenAIModel(
-            model_name="gpt-4o-mini",
+            model_name="gpt-4o",
             api_key=openai_api_key
         )
 
@@ -80,23 +82,31 @@ class StrideAgent:
             system_prompt=[
                 "You are a threat modeling expert using STRIDE methodology.",
                 "",
-                "Your task is to analyze the given relationship and metadata and generate Threat using STRIDE methodology",
-                "Your analytic angle can be technical cyber security threats or threats from business logic flaws",
-                "Do not make up threats that are not related to the relationship",
+                "Your task is to analyze the given relationship and identify highly specific technical threats using STRIDE methodology.",
+                "Generate threats that describe concrete attack scenarios with precise technical details, not just abstract categories.",
                 "",
-                "Here is the STRIDE methodology, use it as Category:",
-                "- Spoofing",
-                "- Tampering",
-                "- Repudiation",
-                "- Information Disclosure",
-                "- Denial of Service",
-                "- Elevation of Privilege",
+                "When analyzing, consider:",
+                "1. Component-specific vulnerabilities - What exact weaknesses in this component could be exploited?",
+                "2. Protocol-level attacks - What protocol-specific manipulation could occur?",
+                "3. Implementation flaws - What common coding mistakes create vulnerabilities?",
+                "4. Data flow weaknesses - How could data be intercepted, modified, or leaked?",
+                "5. Trust boundary violations - How could trust assumptions be broken?",
                 "",
-                "When specifying the category, use the full name from the list above, spelled correctly and in title case.",
+                "For each threat, provide:",
+                "- A specific name describing the exact attack method (e.g., 'Eavesdropping Access Tokens' not just 'Information Disclosure')",
+                "- Detailed attack vectors describing precise technical exploitation methods",
+                "- Implementation context and prerequisites necessary for the attack",
+                "- Concrete technical impacts specific to the relationship",
                 "",
-                "Analyze the given relationship and metadata and generate Threat using STRIDE methodology",
-                "Provide your analysis in a structured format that will be used for deeper security research."
-                ""
+                "Here is the STRIDE methodology for categorization:",
+                "- Spoofing: Pretending to be someone/something else",
+                "- Tampering: Unauthorized modification of data/communications",
+                "- Repudiation: Denying having performed an action",
+                "- Information Disclosure: Exposing information to unauthorized parties",
+                "- Denial of Service: Preventing legitimate access",
+                "- Elevation of Privilege: Gaining capabilities beyond authorization",
+                "",
+                "Be highly technical, specific, and precise in your threat descriptions.",
             ],
             result_type=Threats,
             deps_type=Deps,
@@ -110,24 +120,28 @@ class StrideAgent:
             category: str,
             impacts: str,
             summary: str,
+            attack_vectors: str,
+            prerequisites: str,
             severity: str,
             likelihood: str
         ) -> Threats:
             """
-            Analyze the user input to extract threat modeling components.
+            Analyze the relationship to identify specific, technical threats.
 
             Args:
                 ctx: The run context containing the relationship
                 id: Unique identifier for this threat
-                name: Short descriptive name for this threat
-                category: Threat category (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege)
-                impacts: Potential security impacts or consequences for this scenario
-                summary: Brief summary of this specific threat
+                name: Name describing the specific attack method (not just the category)
+                category: STRIDE category
+                impacts: Business and technical impact of this threat
+                summary: Technical details of how this attack would be executed
+                attack_vectors: Specific methods an attacker would use to exploit this vulnerability
+                prerequisites: Conditions necessary for this attack to be possible
                 severity: Estimated severity (Critical, High, Medium, Low)
                 likelihood: Estimated likelihood (High, Medium, Low)
 
             Returns:
-                Structured threat model with relationships, impacts, and techniques
+                Structured threat model with detailed technical assessment
             """
             relationship = ctx.deps.relationship
             id = str(uuid.uuid4())[:8]
@@ -146,6 +160,8 @@ class StrideAgent:
                 scope=scope_dict,
                 impacts=impacts,
                 threat=summary,
+                attack_vectors=attack_vectors,
+                prerequisites=prerequisites,
                 severity=severity,
                 likelihood=likelihood
             )
@@ -154,25 +170,35 @@ class StrideAgent:
 
     async def run(self, relationship: Relationship, context: str) -> Threats:
         """
-        Run the threat modeling analysis on the given user input
-
-        Args:
-            relationship: The relationship between components
-
-        Returns:
-            Structured threat model with relationships, impacts, and techniques
+        Run the threat modeling analysis on the given relationship
         """
-        # Convert Relationship object to a dictionary
-        # Create a simple string representation of the relationship
+        # Create a detailed prompt
         prompt = f"""
-        Analyze the security threats for a relationship from {relationship.source} to {relationship.target}.
-        Context: {context}
+        Analyze the security threats for the relationship from {relationship.source} to {relationship.target}.
+        
+        Component details:
+        - Source component: {relationship.source} 
+          - Consider its implementation details, typical vulnerabilities, and trust assumptions
+        
+        - Target component: {relationship.target}
+          - Consider what it protects, how it validates requests, and potential implementation weaknesses
+        
+        - Relationship type: {relationship.direction}
+          - Consider data flows, authentication methods, and protocol-specific attacks
+        
+        - Relationship details: {relationship.description}
+        
+        Additional technical context: {context}
+        
+        For each threat:
+        1. Name it after the specific attack technique, not just the category
+        2. Describe exact technical methods an attacker would use
+        3. Specify implementation assumptions or conditions necessary for the attack
+        4. Detail precise technical impacts on confidentiality, integrity, or availability
+        
+        Aim for the level of technical specificity found in security RFCs and formal threat models.
         """
 
         deps = Deps(relationship=relationship)
-
-        # Pass the dictionary to the agent with a specific parameter name
         result = await self.agent.run(prompt, deps=deps)
-
-        # The analyze_threat_model tool will be called by the model and return a ThreatModelOutput
         return result
