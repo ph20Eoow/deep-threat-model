@@ -49,7 +49,7 @@ async def stream_stride_threats(request: tm.ThreatModelRequest):
         headers={
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
-            "X-Accel-Buffering": "no"  # Prevents nginx buffering
+            # "X-Accel-Buffering": "no"  # Prevents nginx buffering
         }
     )
 
