@@ -14,6 +14,8 @@ import {
 } from "../tooltip";
 import { FaInfoCircle, FaExternalLinkAlt } from "react-icons/fa";
 import { useAppStore } from "@/stores/app";
+import { Label } from "../label";
+import { SidebarMenuItem, SidebarMenuButton } from "../sidebar";
 
 const BYOL = () => {
   const { apiKeys, updateApiKeys } = useAppStore();
@@ -21,9 +23,12 @@ const BYOL = () => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <BsGear size={20} />
-        </Button>
+        <SidebarMenuItem>
+          <SidebarMenuButton>
+            <BsGear size={20} />
+            <span>Settings</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
       </PopoverTrigger>
       <PopoverContent side="right" asChild className="w-[600px]">
         <Card className="p-0">

@@ -36,9 +36,10 @@ export function AppSidebar() {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href="https://github.com/ph20Eoow/deep-threat-model">
+                  <a href="https://github.com/ph20Eoow/deep-threat-model">
                     <FaGithub size={20} />
-                  </Link>
+                    <span>Star us on GitHub</span>
+                  </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
