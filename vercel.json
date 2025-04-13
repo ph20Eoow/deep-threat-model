@@ -1,8 +1,13 @@
 {
   "builds": [
-    { "src": "api/index.py", "use": "@vercel/python", "maxDuration": 300 },
+    { "src": "api/index.py", "use": "@vercel/python" },
     { "src": "package.json", "use": "@vercel/next" }
   ],
+  "functions": {
+    "api/**/*.py": {
+      "maxDuration": 300
+    }
+  },
   "routes": [
     { "src": "/api/(.*)", "dest": "api/index.py" },
     { "src": "/(.*)", "dest": "/$1" }
