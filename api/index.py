@@ -3,9 +3,13 @@ from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-# Add debugging for imports
+# Suppress logfire warning (from last conversation)
 import sys
 import os
+os.environ["LOGFIRE_IGNORE_NO_CONFIG"] = "1"
+
+# Configure proper streaming for Vercel
+os.environ["PYTHONUNBUFFERED"] = "1"  # Ensure Python doesn't buffer output
 
 print(f"Current working directory: {os.getcwd()}")
 print(f"Python path: {sys.path}")
@@ -37,10 +41,18 @@ async def stream_stride_threats(request: tm.ThreatModelRequest):
     Streaming endpoint for the relationship extraction and STRIDE threat generation process.
     """
     print(f"Received request: {request}")
+    
+    # Configure the response for proper streaming on Vercel
     return StreamingResponse(
         tm.analyze(request),
-        media_type="text/event-stream"
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no"  # Prevents nginx buffering
+        }
     )
+
 # Include router
 @router.get("/health")
 def health_check():
